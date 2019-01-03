@@ -9,8 +9,8 @@ import NextArrowButton from '../components/buttons/NextArrowButton'
 import Notification from '../components/form/Notification'
 import TriangleButton from '../components/buttons/TriangleButton';
 import Loader from '../components/form/Loader'
-import { ActionCreators } from '../redux/actions'
-import { bindActionCreators } from 'redux';
+import user from '../data/user.json'
+import { setLoggedInState } from '../redux/LogInState/LogInActions'
 import { connect } from 'react-redux'
 
 class LogIn extends Component {
@@ -35,15 +35,17 @@ class LogIn extends Component {
         this.setState({ loadingVisible: true })
         setTimeout(() => {
             const { email, password } = this.state
-            console.log(email)
-            console.log(password)
-            if (this.props.login(email, password)) {
-                this.setState({ formValid: true, loadingVisible: false })
+            if (email === user.email && password === user.password) {
+                setLoggedInState(true)
+                this.setState({ formValid: true, loadingVisible: false },
+                    () => setLoggedInState(true),
+                    console.log(this.props.loggedInState))
             } else {
-                this.setState({ formValid: false, loadingVisible: false })
+                this.setState({ formValid: false, loadingVisible: false },
+                    () => setLoggedInState(false),
+                    console.log(this.props.loggedInState))
             }
         }, 2000)
-
     }
 
     handleCloseNotification() {
@@ -198,13 +200,7 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state => ({
-    loggedInState: state.loggedInState,
+    loggedInState: state.logInState.loggedInState,
 })
 
-const mapDispatchToProps = dispatch => {
-    return bindActionCreators(ActionCreators, dispatch)
-}
-
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(LogIn)
+export default connect(mapStateToProps)(LogIn)
